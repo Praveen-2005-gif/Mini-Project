@@ -3,14 +3,17 @@
 {% block content %}
 <!-- Filter Bar -->
 <form method="GET" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3">
-    <input type="text" name="q" value="{{ query }}" placeholder="Search by faculty name or subject..." class="flex-1 px-4 py-2 border rounded-lg text-sm">
+    <div class="curved-search flex-1">
+        <label class="sr-only" for="faculty-search">Search faculty by name or subject</label>
+        <input id="faculty-search" type="search" name="q" value="{{ query }}" placeholder="Search faculty or subject..." class="curved-search__input">
+        <button type="submit" class="curved-search__button">Search</button>
+    </div>
     <select name="department" class="px-4 py-2 border rounded-lg text-sm">
         <option value="">All Departments</option>
         {% for d in departments %}
         <option value="{{ d.id }}" {% if selected_dept == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
         {% endfor %}
     </select>
-    <button type="submit" class="px-6 py-2 rounded-lg bg-royal-600 text-white font-semibold text-sm hover:bg-royal-500">Filter</button>
 </form>
 
 <!-- Faculty Cards Grid -->

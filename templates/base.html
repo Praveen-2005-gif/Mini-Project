@@ -7,6 +7,57 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .curved-search {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 0;
+            min-height: 3.5rem;
+            padding: 0.4rem 0.45rem 0.4rem 1.25rem;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 50% / 65%;
+            background: #fff;
+            transition: border-color 160ms ease, box-shadow 160ms ease;
+        }
+        .curved-search:focus-within {
+            border-color: #1D4ED8;
+            box-shadow: 0 0 0 4px rgb(29 78 216 / 14%);
+        }
+        .curved-search__input {
+            flex: 1 1 auto;
+            min-width: 0;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: #0B192C;
+            font: inherit;
+            font-size: 0.875rem;
+        }
+        .curved-search__input::placeholder { color: #64748b; }
+        .curved-search__button {
+            flex: 0 0 auto;
+            min-height: 2.65rem;
+            padding: 0 1.25rem;
+            border: 0;
+            border-radius: 50% / 65%;
+            background: #1D4ED8;
+            color: #fff;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 160ms ease;
+        }
+        .curved-search__button:hover { background: #2563EB; }
+        .curved-search__button:focus-visible {
+            outline: 3px solid #93c5fd;
+            outline-offset: 2px;
+        }
+        @media (max-width: 480px) {
+            .curved-search { min-height: 3.25rem; padding-left: 1rem; }
+            .curved-search__button { min-height: 2.45rem; padding: 0 1rem; }
+        }
+    </style>
     <script>
         tailwind.config = {
             theme: {

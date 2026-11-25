@@ -7,9 +7,12 @@
         <h2 class="text-xl font-bold">Welcome back, {{ student.user.first_name }}!</h2>
         <p class="text-sm text-blue-100 mt-1">Find available professors, inspect real-time schedules, and book academic consultations.</p>
     </div>
-    <form action="{% url 'faculty_directory' %}" method="GET" class="flex w-full md:w-auto gap-2">
-        <input type="text" name="q" placeholder="Search faculty or subject..." class="px-4 py-2 rounded-lg text-slate-900 text-sm w-full md:w-64">
-        <button type="submit" class="px-4 py-2 rounded-lg bg-white text-navy-900 font-bold text-sm hover:bg-blue-50">Search</button>
+    <form action="{% url 'faculty_directory' %}" method="GET" class="w-full md:w-auto md:min-w-[24rem]">
+        <div class="curved-search w-full">
+            <label class="sr-only" for="dashboard-faculty-search">Search faculty by name or subject</label>
+            <input id="dashboard-faculty-search" type="search" name="q" placeholder="Search faculty or subject..." class="curved-search__input">
+            <button type="submit" class="curved-search__button">Search</button>
+        </div>
     </form>
 </div>
 
