@@ -1,0 +1,29 @@
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+venv_*/
+.venv/
+env/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Django generated files
+*.log
+/db.sqlite3
+/db.sqlite3-journal
+/media/
+/staticfiles/
+
+# Tooling and OS files
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.DS_Store
+Thumbs.db

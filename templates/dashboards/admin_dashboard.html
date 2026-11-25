@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block page_title %}Admin Analytics & System Control{% endblock %}
+{% block content %}
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <p class="text-xs font-semibold uppercase text-slate-400">Total Faculty</p>
+        <p class="text-3xl font-bold text-navy-900 mt-1">{{ total_faculty }}</p>
+    </div>
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <p class="text-xs font-semibold uppercase text-slate-400">Total Students</p>
+        <p class="text-3xl font-bold text-navy-900 mt-1">{{ total_students }}</p>
+    </div>
+    <div class="bg-white p-5 rounded-xl border-l-4 border-emerald-500 shadow-sm">
+        <p class="text-xs font-semibold uppercase text-slate-400">Available / Free Now</p>
+        <p class="text-3xl font-bold text-emerald-600 mt-1">{{ available_now }}</p>
+    </div>
+    <div class="bg-white p-5 rounded-xl border-l-4 border-rose-500 shadow-sm">
+        <p class="text-xs font-semibold uppercase text-slate-400">Busy / In Class</p>
+        <p class="text-3xl font-bold text-rose-600 mt-1">{{ busy_now }}</p>
+    </div>
+    <div class="bg-white p-5 rounded-xl border-l-4 border-amber-500 shadow-sm">
+        <p class="text-xs font-semibold uppercase text-slate-400">Pending Requests</p>
+        <p class="text-3xl font-bold text-amber-600 mt-1">{{ pending_appointments }}</p>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="font-bold text-navy-900 mb-4">Real-Time Campus Availability Distribution</h3>
+        <canvas id="availabilityChart" height="180"></canvas>
+    </div>
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="font-bold text-navy-900 mb-4">Faculty Strength by Department</h3>
+        <canvas id="deptChart" height="180"></canvas>
+    </div>
+</div>
+
+<!-- CSV Upload & ML Model Control -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+        <h3 class="font-bold text-navy-900">Bulk CSV Timetable Upload</h3>
+        <p class="text-xs text-slate-500">CSV Header: <code>employee_id,day_of_week,period_code,slot_type,subject_code,room_number</code></p>
+        <form method="POST" enctype="multipart/form-data" class="space-y-3">
+            {% csrf_token %}
+            {{ csv_form.csv_file }}
+            <button type="submit" name="upload_csv" class="px-4 py-2 rounded-lg bg-royal-600 text-white text-sm font-semibold hover:bg-royal-500">
+                Import Timetable CSV
+            </button>
+        </form>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+        <h3 class="font-bold text-navy-900">Machine Learning Engine Status</h3>
+        <p class="text-sm text-slate-600">Collected Training Records: <span class="font-bold text-navy-900">{{ ml_record_count }}</span> (Minimum 30 required for Random Forest activation).</p>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" name="retrain_ml" class="px-4 py-2 rounded-lg bg-navy-900 text-white text-sm font-semibold hover:bg-navy-700">
+                Train / Evaluate Random Forest Model
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const statusData = JSON.parse('{{ status_chart_json|escapejs }}');
+    new Chart(document.getElementById('availabilityChart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(statusData),
+            datasets: [{
+                data: Object.values(statusData),
+                backgroundColor: ['#10B981', '#0D9488', '#EF4444', '#F59E0B']
+            }]
+        }
+    });
+
+    new Chart(document.getElementById('deptChart'), {
+        type: 'bar',
+        data: {
+            labels: JSON.parse('{{ dept_labels_json|escapejs }}'),
+            datasets: [{
+                label: 'Faculty Members',
+                data: JSON.parse('{{ dept_counts_json|escapejs }}'),
+                backgroundColor: '#2563EB',
+                borderRadius: 6
+            }]
+        }
+    });
+</script>
+{% endblock %}

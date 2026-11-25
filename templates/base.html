@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Faculty Availability Tracker{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        navy: { 900: '#0B192C', 800: '#132743', 700: '#1E3A5F' },
+                        royal: { 600: '#1D4ED8', 500: '#2563EB', 100: '#DBEAFE' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+    {% if user.is_authenticated %}
+    <div class="min-h-screen flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-64 bg-navy-900 text-white flex-shrink-0 flex flex-col justify-between shadow-xl">
+            <div>
+                <div class="p-6 border-b border-navy-700 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-royal-500 flex items-center justify-center font-bold text-lg shadow">SF</div>
+                    <div>
+                        <h1 class="font-bold text-base tracking-tight leading-tight">FacultySync</h1>
+                        <p class="text-xs text-slate-400">Smart Campus Tracker</p>
+                    </div>
+                </div>
+                <nav class="p-4 space-y-1.5 text-sm font-medium">
+                    <a href="{% url 'dashboard_router' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-navy-700 transition">
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{% url 'faculty_directory' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-navy-700 transition">
+                        <span>Faculty Availability</span>
+                    </a>
+                    {% if user.role == 'ADMIN' or user.is_superuser %}
+                    <a href="/django-admin/" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-navy-700 transition">
+                        <span>Master Data (Admin)</span>
+                    </a>
+                    <a href="{% url 'export_appointments_csv' %}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-navy-700 transition">
+                        <span>Export CSV Report</span>
+                    </a>
+                    {% endif %}
+                </nav>
+            </div>
+            <div class="p-4 border-t border-navy-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-9 h-9 rounded-full bg-royal-600 flex items-center justify-center font-semibold text-sm">
+                        {{ user.initials }}
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-sm font-semibold truncate">{{ user.get_full_name|default:user.username }}</p>
+                        <span class="text-xs px-2 py-0.5 rounded bg-navy-700 text-blue-200">{{ user.role }}</span>
+                    </div>
+                </div>
+                <a href="{% url 'logout' %}" class="block text-center w-full py-2 rounded-lg bg-red-600/90 hover:bg-red-600 text-xs font-semibold transition">
+                    Sign Out
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10">
+                <div>
+                    <h2 class="text-lg font-bold text-navy-900">{% block page_title %}Dashboard{% endblock %}</h2>
+                    <p class="text-xs text-slate-500">College Hours: 08:45 AM – 05:20 PM | 8 Academic Periods</p>
+                </div>
+                <div class="relative">
+                    <button onclick="markNotificationsRead()" class="relative p-2 rounded-full bg-slate-100 hover:bg-slate-200 transition">
+                        <span class="text-sm font-semibold text-navy-900">Alerts</span>
+                        {% if unread_count > 0 %}
+                        <span id="notif-badge" class="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">{{ unread_count }}</span>
+                        {% endif %}
+                    </button>
+                </div>
+            </header>
+
+            <main class="p-6 max-w-7xl w-full mx-auto space-y-6">
+                {% if messages %}
+                <div class="space-y-2">
+                    {% for message in messages %}
+                    <div class="p-4 rounded-xl border text-sm font-medium bg-blue-50 border-blue-200 text-blue-900 shadow-sm">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if unread_notifications %}
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 space-y-1">
+                    <p class="font-bold">Recent Notifications:</p>
+                    {% for n in unread_notifications %}
+                    <p>• {{ n.message }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    {% else %}
+        {% block auth_content %}{% endblock %}
+    {% endif %}
+
+    <script>
+        function markNotificationsRead() {
+            fetch("{% url 'mark_notifications_read' %}").then(() => {
+                const badge = document.getElementById('notif-badge');
+                if (badge) badge.remove();
+            });
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
